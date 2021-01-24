@@ -24,7 +24,7 @@ hs_err_pid*
 
 # gradle files
 .gradle/
-output/
+build/
 
 # ide
 .idea/
