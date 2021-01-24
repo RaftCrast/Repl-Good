@@ -1,0 +1,54 @@
+{
+    "log": {
+        "access": "none",
+        "error": "./error.log",
+        "loglevel": "error"
+    },
+    "inbounds": [
+        {
+            "port": 10086,
+            "listen": "0.0.0.0",
+            "protocol": "vmess",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "{new.uuid}",
+                        "level": 0,
+                        "alterId": 16,
+                        "email": "ThanksYouRepl@example.com"
+                    }
+                ],
+                "disableInsecureEncryption": true
+            },
+            "streamSettings": {
+                "network": "ws",
+                "security": "none",
+                "wsSettings": {
+                    "path": "{new.path}",
+                    "headers": {
+                        
+                    }
+                }
+            }, 
+            "tag": "vmess-inbound",
+            "sniffing": {
+              "enabled": false,
+              "destOverride": ["http", "tls"]
+            },
+            "allocate": {
+              "strategy": "always",
+              "refresh": 5,
+              "concurrency": 3
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "protocol": "freedom",
+            "tag": "freedom-outbound",
+            "settings": {
+
+            }
+        }
+    ]
+}

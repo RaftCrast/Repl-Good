@@ -4,12 +4,17 @@ plugins {
 }
 
 apply plugin: 'kotlin-kapt'
+apply plugin: 'application'
 
 group 'com.github.raftcrast'
 version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+}
+
+application {
+    mainClassName = "com.github.raftcrast.repl_yes.ReplYesMainKt"
 }
 
 dependencies {
