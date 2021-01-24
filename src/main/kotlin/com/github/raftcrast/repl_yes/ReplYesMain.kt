@@ -29,7 +29,7 @@ fun main() {
         println("It seems that you are ready for v2ray. Do you want to continue to configure v2ray? " +
                 "This will lose the existing configuration file!")
         val input = getInput(
-            "If you are sure, please enter (y) es, " +
+            "If you are sure, please enter (y)es, " +
                     "otherwise enter something else to cancel the operation: "
         )
         if (input != "y") {
