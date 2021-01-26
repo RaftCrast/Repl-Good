@@ -17,7 +17,6 @@ import java.util.zip.ZipInputStream
 import kotlin.system.exitProcess
 
 val httpClient = OkHttpClient.Builder()
-    .proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress("localhost", 1088)))
     .build()
 const val zipPackageName = "v2ray-linux-64.zip"
 
@@ -37,8 +36,8 @@ fun main() {
                     "If it is a misoperation, you can do it again.")
             exitProcess(1)
         } else {
-            println("It seems that you have already decided, so let's start to configure v2ray!")
-            println("Remember, until the last step, you can cancel the configuration with `Ctrl + C`.")
+            println("It seems that you have already decided, so let's start to configure v2ray!\n" +
+                    "Remember, until the last step, you can cancel the configuration with `Ctrl + C`.")
         }
     }
     setReplStartScript()
