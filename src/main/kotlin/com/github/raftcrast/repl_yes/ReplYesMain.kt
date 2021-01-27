@@ -97,6 +97,8 @@ fun getLatestV2rayDownloadUrl(): String {
 
     println("Getting the latest version of v2ray...")
     httpClient.newCall(request).execute().use {
+        // Sometimes, I really don't like to use data classes to parse JSON,
+        // which requires me to write several data classes but only use them once in the code :(
         val moshi = Moshi.Builder()
             .addLast(KotlinJsonAdapterFactory())
             .build()
@@ -120,7 +122,7 @@ fun getLatestV2rayDownloadUrl(): String {
 }
 
 fun setReplStartScript(installDirectory: File? = File(".")) {
-    val startScriptFile = File(installDirectory, "com.github.raftcrast.repl_yes.main.sh")
+    val startScriptFile = File(installDirectory, "main.sh")
     if (!startScriptFile.exists() && !startScriptFile.createNewFile()) {
         throw FileNotFoundException("Start script creation failed")
     } else if (!startScriptFile.isFile) {
@@ -199,6 +201,10 @@ fun generateShareLink(replUserName: String, replName: String, uuid: UUID, path: 
     return "vmess://" + Base64.getEncoder().encodeToString(shareInfo.encodeToByteArray())
 }
 
+/**
+ * Receives an input from the standard input, ending with a carriage return.
+ * @param msg prompt information.
+ */
 fun getInput(msg: String?): String = Scanner(System.`in`).let {
     if (msg != null) {
         print(msg)
@@ -206,6 +212,10 @@ fun getInput(msg: String?): String = Scanner(System.`in`).let {
     return it.nextLine()
 }
 
+/**
+ * Random string generation for generating random names and random paths.
+ * @param length string length.
+ */
 fun randomString(length: Int): String {
     val charsString = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     val chars: Array<Char> = Array(charsString.length, init = {' '})
@@ -222,10 +232,18 @@ fun randomString(length: Int): String {
     return builder.toString()
 }
 
+/**
+ * Check whether v2ray is installed by calling the main program of v2ray.
+ * @param installDirectory v2ray installation directory
+ */
 fun checkV2rayCore(installDirectory: File? = File(".")) :Boolean {
-    val process = Runtime.getRuntime().exec("./v2ray -version", emptyArray(), installDirectory)
-    println(String(process.inputStream.readAllBytes()))
-    process.waitFor(5L, TimeUnit.SECONDS)
-    val exitValue = process.exitValue()
-    return exitValue == 0
+    return try {
+        val process = Runtime.getRuntime().exec("./v2ray -version", emptyArray(), installDirectory)
+        println(String(process.inputStream.readAllBytes()))
+        process.waitFor(5L, TimeUnit.SECONDS)
+        process.exitValue() == 0
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
 }
