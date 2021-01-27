@@ -41,6 +41,7 @@ fun main() {
         }
     }
     setReplStartScript()
+    println("There are two last steps left!")
     generateV2rayConfig()
 }
 
@@ -82,7 +83,7 @@ fun installV2ray(zipFile: File = File(zipPackageName), installDirectory: File = 
             }
         }
     }
-    println("Success!")
+    println("Install Success!")
 }
 
 fun getLatestV2rayDownloadUrl(): String {
@@ -134,52 +135,49 @@ fun setReplStartScript(installDirectory: File? = File(".")) {
     }
 }
 
-fun generateV2rayConfig(installDirectory: File? = File(".")) {
-    val uuidFlag = "{new.uuid}"
-    val pathFlag = "{new.path}"
-    val configFile = File(installDirectory, "config.json")
-    if (!configFile.exists() && !configFile.createNewFile()) {
-        throw FileNotFoundException("Configuration file creation failed")
-    }
-
+fun generateV2rayConfig(installDirectory: File = File(".")) {
     val randomUUID = UUID.randomUUID()
     val randomPath = "/${randomString(16)}"
-    val configTemplateStream = GetResourceException::class.java.getResourceAsStream("/server.json")
-        ?: throw GetResourceException("Configuration template not found")
 
-    configFile.bufferedWriter(StandardCharsets.UTF_8).use {
-        BufferedReader(InputStreamReader(configTemplateStream, StandardCharsets.UTF_8))
-            .lines()
-            .forEach { line ->
-                var lineBuffer = line
-                val uuidIndex = lineBuffer.indexOf(uuidFlag)
-                if (uuidIndex >= 0) {
-                    lineBuffer = lineBuffer
-                        .replaceRange(uuidIndex, uuidIndex + uuidFlag.length, randomUUID.toString())
-                }
-
-                val pathIndex = lineBuffer.indexOf(pathFlag)
-                if (pathIndex >= 0) {
-                    lineBuffer = lineBuffer
-                        .replaceRange(pathIndex, pathIndex + pathFlag.length, randomPath)
-                }
-
-                it.append(lineBuffer)
-                it.newLine()
-            }
-    }
-
-    println("Install Success!")
-    println("There are two last steps left!")
     val shareLink = generateShareLink(
         getInput("Please tell me your repl user name: ").toLowerCase(),
         getInput("And your repl workspace name: ").replace(' ', '-'),
         randomUUID,
         randomPath
     )
+
+    generateConfigToFile(installDirectory, uuid = randomUUID, path = randomPath)
     println("success! Repl is ready! Click the run button at the top, start v2ray server, " +
             "import the following sharing link into the client, and you're done! Enjoy it~")
     println(shareLink)
+}
+
+fun generateConfigToFile(installDirectory: File, uuid: UUID, path: String) {
+    val uuidFlag = "{new.uuid}"
+    val pathFlag = "{new.path}"
+
+    val configFile = File(installDirectory, "config.json")
+    if (!configFile.exists() && !configFile.createNewFile()) {
+        throw FileNotFoundException("Configuration file creation failed")
+    }
+
+    val configTemplateStream = GetResourceException::class.java.getResourceAsStream("/server.json")
+        ?: throw GetResourceException("Configuration template not found")
+
+    val configBuffer = StringBuilder()
+    BufferedReader(InputStreamReader(configTemplateStream, StandardCharsets.UTF_8))
+        .lines().forEach { configBuffer.append(it).append('\n') }
+
+    val uuidIndex = configBuffer.indexOf(uuidFlag)
+    if (uuidIndex >= 0) {
+        configBuffer.replace(uuidIndex, uuidIndex + uuidFlag.length, uuid.toString())
+    }
+
+    val pathIndex = configBuffer.indexOf(pathFlag)
+    if (pathIndex >= 0) {
+        configBuffer.replace(pathIndex, pathIndex + pathFlag.length, path)
+    }
+    configFile.bufferedWriter(StandardCharsets.UTF_8).use { it.write(configBuffer.toString()) }
 }
 
 fun generateShareLink(replUserName: String, replName: String, uuid: UUID, path: String): String {
