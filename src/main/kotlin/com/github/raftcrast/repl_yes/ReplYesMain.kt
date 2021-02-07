@@ -68,7 +68,7 @@ fun downloadAndInstallV2ray(installDirectory: File = File(".")) {
 }
 
 fun installV2ray(zipFile: File = File(zipPackageName), installDirectory: File = File(".")) {
-    print("Installing V2ray...")
+    println("Installing V2ray...")
     ZipInputStream(FileInputStream(zipFile)).use {
         while (true) {
             val zipEntry = it.nextEntry ?: break
@@ -82,6 +82,10 @@ fun installV2ray(zipFile: File = File(zipPackageName), installDirectory: File = 
                 Files.copy(it, entryFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
         }
+    }
+    if (!setPermissionsOfV2ray(installDirectory)) {
+        println("Warning, v2ray core execution permission setting failed, " +
+                "please add execution permission to v2ray core manually")
     }
     println("Install Success!")
 }
@@ -122,7 +126,7 @@ fun getLatestV2rayDownloadUrl(): String {
     return targetUrl
 }
 
-fun setReplStartScript(installDirectory: File? = File(".")) {
+fun setReplStartScript(installDirectory: File = File(".")) {
     val startScriptFile = File(installDirectory, "main.sh")
     if (!startScriptFile.exists() && !startScriptFile.createNewFile()) {
         throw FileNotFoundException("Start script creation failed")
@@ -216,7 +220,7 @@ fun getInput(msg: String?): String = Scanner(System.`in`).let {
  */
 fun randomString(length: Int): String {
     val charsString = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    val chars: Array<Char> = Array(charsString.length, init = {' '})
+    val chars: Array<Char> = Array(charsString.length, init = { 0.toChar() })
     charsString.forEachIndexed { index, char ->
         chars[index] = char
     }
@@ -234,7 +238,7 @@ fun randomString(length: Int): String {
  * Check whether v2ray is installed by calling the main program of v2ray.
  * @param installDirectory v2ray installation directory
  */
-fun checkV2rayCore(installDirectory: File? = File(".")) :Boolean {
+fun checkV2rayCore(installDirectory: File = File(".")) :Boolean {
     return try {
         val process = Runtime.getRuntime().exec("./v2ray -version", emptyArray(), installDirectory)
         println(String(process.inputStream.readAllBytes()))
@@ -245,3 +249,10 @@ fun checkV2rayCore(installDirectory: File? = File(".")) :Boolean {
         false
     }
 }
+
+fun setPermissionsOfV2ray(installDirectory: File = File(".")): Boolean {
+    val process = Runtime.getRuntime().exec("chmod 777 ./v2ray", emptyArray(), installDirectory)
+    process.waitFor(5L, TimeUnit.SECONDS)
+    return process.exitValue() == 0
+}
+
