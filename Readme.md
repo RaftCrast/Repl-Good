@@ -15,4 +15,6 @@ Click it to support Replit: https://repl.it/site/pricing
 
 1. Download the latest version of repl yes from the release page and unzip it in repl;
 2. After decompression, run repl-yes in bin folder;
-
+3. Follow the prompts to complete the remaining steps;
+4. If the steps are correct, the share provided by the importer is linked to the client to add the repl node;
+5. If there is an error, just rerun repl-yes;
