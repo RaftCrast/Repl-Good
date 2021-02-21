@@ -1,5 +1,7 @@
 # Repl Yes!
 
+Replit: https://repl.it
+
 First, thank Replit for providing us with the computing platform.  
 If you feel great, you can buy Replit's "Hacker Plan" to support replit! 
 (the winter special is only $5 a month. I don't plan to receive any subsidy, 
